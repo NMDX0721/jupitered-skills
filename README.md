@@ -1,139 +1,259 @@
-# JupiterEd Automation Skills (Universal Edition)
+# 🎓 JupiterEd Automation Skill (Universal Edition)
 
-> 🚀 **The Skill is made by NMDX0721**  
-> GitHub Repository: [https://github.com/NMDX0721/jupitered-skills](https://github.com/NMDX0721/jupitered-skills)
+<div align="center">
 
----
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python Version](https://img.shields.io/badge/Python-3.9%2B-blue.svg)](https://www.python.org/)
+[![Playwright](https://img.shields.io/badge/Playwright-Chromium%20%7C%20Edge%20%7C%20Chrome-green.svg)](https://playwright.dev/)
+[![Compatible Agents](https://img.shields.io/badge/Agents-Antigravity%20%7C%20Claude%20%7C%20Cursor%20%7C%20OpenCode-purple.svg)]()
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/NMDX0721/jupitered-skills/pulls)
 
-## 📖 简介 / Overview
+**Production-grade, zero-password-storage automation skill & CLI toolkit for the JupiterEd student portal.**  
+*Seamlessly integrates into AI Coding Agents (Google Antigravity, Claude Code, Cursor, OpenCode / MiMo) and Standalone Terminals.*
 
-本项目是一个**通用的 JupiterEd 学生端自动化工具与 AI Agent 技能**。
-
-无论你是直接在终端将其作为**独立命令行工具 (CLI)** 使用，还是接入各类 **AI 编程助手与 Agent 生态（如 Google Antigravity、Claude Code、Cursor、OpenCode / MiMo 等）**，均可实现开箱即用的学业自动化。
-
-通过底层基于 **Playwright** 的无头/有头浏览器与持久化会话机制，本工具能够安全、高效地处理 JupiterEd (login.jupitered.com) 的各项学业事务：
-- 📊 **待办与成绩查询**：实时抓取 To Do 待办清单与各科目当前 GPA/Quarter 成绩。
-- 🔍 **作业详情与课件探测**：自动解析 SPA 页面中隐藏的 `openmat()` 课件，直接定位底层 AWS S3 直链高速下载。
-- 📁 **教师 Materials 资料库全量同步**：深度递归遍历教师共享文件目录与云端 handout 讲义。
-- 📬 **站内信箱扫描**：提取教师私信、群发通知及其附件。
-- 📤 **作业自动提交 (Turn In)**：支持一键将本地作业文档/PDF 提交至指定作业项。
+[Features](#-key-features) • [Quick Start](#-quick-start) • [Authentication Modes](#-authentication--zero-password-onboarding) • [Agent Usage](#-ai-agent-integration) • [CLI Reference](#-cli-command-reference)
 
 ---
 
-## 🛠️ 安装与部署 / Installation & Deployment
+</div>
 
-### 1. 安装基础依赖
+## 📑 目录 / Table of Contents
+
+- [✨ 核心特性 / Key Features](#-核心特性--key-features)
+- [🏗️ 工作架构 / Architecture](#️-工作架构--architecture)
+- [🚀 快速开始 / Quick Start](#-快速开始--quick-start)
+  - [1. 依赖安装](#1-依赖安装--prerequisites)
+  - [2. 部署到不同环境](#2-部署方式--deployment)
+- [🔑 鉴权与配置（支持免密模式） / Authentication](#-鉴权与配置支持免密模式--authentication)
+  - [模式 1：Windows 交互令牌桌面弹窗（推荐）](#模式-1windows-交互令牌桌面弹窗🌟-最推荐零密码存储)
+  - [模式 2：CDP 远程调试直连（免弹窗秒级同步）](#模式-2cdp-远程调试直连进阶免弹窗秒连)
+  - [模式 3：直接 Cookie 导入验证](#模式-3直接-cookie-导入验证静默秒过)
+  - [模式 4：AI 对话式自动填入 / 手动配置](#模式-4ai-对话式自动填入--命令行向导)
+- [🤖 在 AI Agent 中使用 / AI Agent Integration](#-在-ai-agent-中使用--ai-agent-integration)
+- [💻 CLI 命令全速查表 / CLI Command Reference](#-cli-命令全速查表--cli-command-reference)
+- [📂 目录结构 / Project Structure](#-目录结构--project-structure)
+- [🔒 安全与隐私准则 / Security & Privacy](#-安全与隐私准则--security--privacy)
+- [📜 鉴权与署名 / Attribution & License](#-鉴权与署名--attribution--license)
+
+---
+
+## ✨ 核心特性 / Key Features
+
+- 🔐 **零密码存储安全保障 (Zero-Password Storage)**：支持交互式登录捕获、CDP 直连以及 Cookie 注入，代码与配置文件中无需保存任何明文密码。
+- ⚡ **Windows 交互令牌弹窗穿透 (Interactive Token / `schtasks /it`)**：攻克 Windows 后台服务（Session 0 / Daemon）无法向物理桌面投射 GUI 的系统级限制，支持在后台一键向前台唤起浏览器。
+- 🧠 **全自动课程嗅探与映射 (Auto Course Discovery)**：登入系统后自动识别当前学期选修的全部学科名称与 `class1` ID，自动生成别名映射表。
+- 📥 **SPA 隐藏课件高速批量提取**：攻克 JupiterEd 单页应用中掩藏在 `openmat()` 内部的资料文件，精准截取底层 AWS S3 直链高速下载。
+- 📚 **教师 Materials 资料库全量同步**：支持递归遍历教师共享目录，一键打包下载全部 handout 与讲义。
+- 📬 **站内信箱与通知扫描**：按教师姓名过滤邮件通知，一键批量拉取消息中的附件文件。
+- 📤 **学业作业一键提交 (Turn In)**：精准上传本地文档/PDF 至指定作业项，自动轮询服务端提交状态确认。
+
+---
+
+## 🏗️ 工作架构 / Architecture
+
+```text
+┌────────────────────────────────────────────────────────┐
+│                   User Intent / Prompt                 │
+│   "帮我查下这周截止的作业" / "下载心理学所有 handout"     │
+└───────────────────────────┬────────────────────────────┘
+                            │
+                            ▼
+┌────────────────────────────────────────────────────────┐
+│                 AI Coding Assistant                    │
+│   (Google Antigravity / Claude Code / Cursor / OpenCode)│
+│                                                        │
+│   ┌────────────────────────────────────────────────┐   │
+│   │  Standard Skill Interface: SKILL.md            │   │
+│   │  - Auto-Onboarding & Course Intent Mapping     │   │
+│   │  - Watermark & Attribution Footer Injection    │   │
+│   └───────────────────────┬────────────────────────┘   │
+└───────────────────────────┼────────────────────────────┘
+                            │
+                            ▼
+┌────────────────────────────────────────────────────────┐
+│             Core Execution Engine (jup_cli.py)         │
+│   ┌───────────────────┐        ┌───────────────────┐   │
+│   │ Playwright Engine │◄───────┤ Auth & Profile    │   │
+│   │ (Edge / Chrome)   │        │ (Cookie / CDP/IT) │   │
+│   └─────────┬─────────┘        └───────────────────┘   │
+└─────────────┼──────────────────────────────────────────┘
+              │
+              ▼
+┌────────────────────────────────────────────────────────┐
+│                   JupiterEd Portal                     │
+│         https://login.jupitered.com/login/             │
+│   ├── To Do List & Quarter Grades                      │
+│   ├── openmat() SPA Attachment Resolution              │
+│   ├── Materials Direct S3 Links Extractor              │
+│   └── Assignment Turn-In File Dispatcher               │
+└────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🚀 快速开始 / Quick Start
+
+### 1. 依赖安装 / Prerequisites
+
+本 Skill 基于 Python 3.9+ 与 Playwright 构建：
+
 ```bash
 pip install playwright
 playwright install chromium
 ```
 
-### 2. 获取代码与部署
+### 2. 部署方式 / Deployment
 
-#### 方式 A：作为独立 CLI 命令行工具使用
-直接克隆到本地任意目录使用：
+根据你的工作环境选择对应的安装方式：
+
+#### 🌟 方式 A：作为全局 AI Agent Skill 安装（推荐）
+适用于 **Google Antigravity** 或 Gemini 全局环境：
+```bash
+git clone https://github.com/NMDX0721/jupitered-skills.git ~/.gemini/antigravity/skills/jupiter-ed
+```
+
+#### 📁 方式 B：当前项目工作区安装
+适用于特定项目或支持 `.agents/` 约定的 AI 环境：
+```bash
+git clone https://github.com/NMDX0721/jupitered-skills.git .agents/skills/jupiter-ed
+```
+
+#### 💻 方式 C：独立命令行工具 (Standalone CLI)
+作为通用终端命令行脚本直接克隆使用：
 ```bash
 git clone https://github.com/NMDX0721/jupitered-skills.git
 cd jupitered-skills
 ```
 
-#### 方式 B：作为 AI Agent Skill 技能集成
-本技能遵循标准化 Agent Skill 规范（包含 `SKILL.md` 指南与 CLI 工具）：
-* **Google Antigravity / Gemini**：
-  * 全局生效：`git clone https://github.com/NMDX0721/jupitered-skills.git ~/.gemini/antigravity/skills/jupiter-ed`
-  * 项目生效：`git clone https://github.com/NMDX0721/jupitered-skills.git .agents/skills/jupiter-ed`
-* **Claude Code / OpenCode / 其他 Agent**：
-  * 克隆至工作区或全局 Skill 目录，Agent 会自动根据 `SKILL.md` 加载与调度工具。
-
 ---
 
-## ⚙️ 配置指引 / Configuration
+## 🔑 鉴权与配置（支持免密模式） / Authentication
 
-本项目支持多种灵活配置方式，**最推荐免密模式，无需在代码或文件中记录你的登录密码**：
+本工具支持 **4 种鉴权模式**，强烈推荐使用免密登录模式，完全无需向代码提供你的密码：
 
-### 方式 1：一键可视化免密登录（🌟 最安全推荐，零密码泄露风险）
-如果你不想在任何配置文件或对话框中输入明文密码，或者平时在浏览器中已开启了“记住密码/自动填充/学校SSO”：
+### 模式 1：Windows 交互令牌桌面弹窗（🌟 最推荐，零密码存储）
+针对 Windows 环境后台进程无法弹窗的限制，内置了 Windows 交互令牌（`schtasks /it`）穿透引擎：
 ```powershell
-python scripts/jup_cli.py login
+python scripts/jup_cli.py login --it
 ```
-* **完全透明安全**：弹出一个干净的 Chrome 窗口访问 Jupiter 官方登录页。你在页面上亲自完成登录（支持自动填充与单点登录）。
-* **自动捕获会话与课程**：登录成功瞬间，脚本自动捕获 session cookie 并**自动探测本学期所有选修科目与 Course ID**，窗口随后自动关闭。代码**完全不读取、不解密、不存储你的密码**！
-* 之后的所有查询与作业提交操作均完全无头、静默在后台运行。
+1. 桌面会自动弹出一个独立的浏览器窗口打开 JupiterEd 官方登录页；
+2. 你在网页上直接登录（支持浏览器的密码自动填充、记住密码或学校 SSO）；
+3. 登录成功的瞬间，脚本自动捕获 session cookie，并**自动提取本学期全部课程映射表**存入 `config.json`；
+4. 窗口自动关闭，此后所有操作均在后台静默运行！
 
----
-
-### 方式 2：AI Agent 对话式自动配置
-如果你在使用 **Antigravity**、**Claude Code**、**Cursor** 或 **OpenCode** 等 AI 助手：
-你**完全不需要手动打开或编辑 JSON 文件**，只需直接对 AI 发送：
-> 💬 *“帮我配置 JupiterEd，账号是 123456，密码是 my_password”*  
-> 💬 或者直接提需求：*“帮我查下这周截止的作业”*（AI 检测到未登录时，会自动提示你运行 `login` 窗口或在对话中协助你一键初始化完成）。
-
----
-
-### 方式 3：命令行参数 / 交互式向导
-如果你习惯在终端管理：
+### 模式 2：CDP 远程调试直连（进阶免弹窗秒连）
+如果你的日常 Edge 或 Chrome 已经登录了 JupiterEd，以调试端口启动浏览器：
 ```powershell
-# 交互式向导（提示输入账号与隐式密码）
-python scripts/jup_cli.py setup
-
-# 或一条命令直接写入并校验
-python scripts/jup_cli.py setup --username "你的学号" --password "你的密码"
+# Windows Edge
+msedge.exe --remote-debugging-port=9222
 ```
+然后直接执行直连：
+```powershell
+python scripts/jup_cli.py attach
+# 或指定端口
+python scripts/jup_cli.py login --cdp 9222
+```
+*0.5 秒内自动隔空提取正在运行的会话 Cookie 与选课表，连弹窗都不需要！*
+
+### 模式 3：直接 Cookie 导入验证（静默秒过）
+在已登录的浏览器按 `F12` 复制 `jupiter=xxxx...`，直接通过命令行或告诉 AI Agent：
+```powershell
+python scripts/jup_cli.py setup --cookie "jupiter=xxxxxxxxxxxxxx"
+```
+后台无头验证 Cookie 有效性，自动完成课程探测。
+
+### 模式 4：AI 对话式自动填入 / 命令行向导
+如果你不介意本地存储账号密码用于 Session 过期时全自动免看管重连：
+- **对话方式**：对 AI Agent 说 `帮我配置 JupiterEd，账号是 123456，密码是 my_password`。
+- **命令行方式**：
+  ```powershell
+  python scripts/jup_cli.py setup --username "学号" --password "密码"
+  ```
 
 ---
 
-### 方式 4：手动编辑配置文件
-1. 复制模版：`cp config.example.json config.json`
-2. 编辑 `config.json` 填入必要字段。
-3. 运行校验：`python scripts/jup_cli.py setup`
+## 🤖 在 AI Agent 中使用 / AI Agent Integration
 
-> 💡 **配置成功提示**：首次配置完成后将弹出友好提示：  
-> `🎉 恭喜配置完成！返回项目 GitHub 仓库链接获取更多内容与更新: https://github.com/NMDX0721/jupitered-skills`
+在任意支持 Skill 机制的 AI 编程助手（如 Antigravity、Claude Code、Cursor、OpenCode）中，挂载本技能后直接使用自然语言：
+
+| 用户提问示例 (User Prompt) | AI 行为 (Agent Action) |
+|---|---|
+| *"帮我看看 Jupiter 上今天有什么截止的作业"* | 触发 `todo` 指令，提取即将到期的作业及 Quarter 成绩 |
+| *"查看我 AP 统计课最近的所有成绩与评分"* | 触发 `grades --course apstat`，列出已打分项目与 ID |
+| *"把心理学老师在 Materials 资料库里放的 handout 全下载下来"* | 触发 `materials --course psych --out <dir>` 批量高速提取 |
+| *"这篇作业里附件阅读下载到桌面"* | 触发 `detail --course ushist --assign <id> --out <dir>` |
+| *"帮我把刚写好的论文 Turn In 提交给历史课作业"* | 触发 `turnin --course ushist --assign <id> --file <path>` |
+
+> 📌 **注**：AI Agent 每次调用本 Skill 回答问题或执行操作后，均会按规范在回答末尾附带作者鉴权署名。
 
 ---
 
-## 💻 常用 CLI 命令 / CLI Usage
+## 💻 CLI 命令全速查表 / CLI Command Reference
+
+所有操作均可通过 `scripts/jup_cli.py` 在终端执行：
 
 ```powershell
-# 查看待办事项与所有科目成绩
+# 1. 查看 To Do 待办事项与全科成绩概要
 python scripts/jup_cli.py todo
 
-# 查看指定科目的详细成绩与作业 ID 列表
-python scripts/jup_cli.py grades --course math
+# 2. 查询指定课程详细成绩及对应 Assignment ID (支持别名或纯ID)
+python scripts/jup_cli.py grades --course psych
+python scripts/jup_cli.py grades --course 6298933
 
-# 查看具体作业详情并批量下载该作业的所有附件
-python scripts/jup_cli.py detail --course math --assign 64802704 --out "./downloads"
+# 3. 查看作业具体要求，并下载该作业掩藏的所有 openmat 课件/阅读材料
+python scripts/jup_cli.py detail --course psych --assign 64802704 --out "./downloads"
 
-# 批量扫描并下载整门学科的所有课件与作业附件
-python scripts/jup_cli.py download-assign --course math --assign all --out "./course_materials"
+# 4. 一键全自动扫描并下载整门学科的所有作业附件
+python scripts/jup_cli.py download-assign --course psych --assign all --out "./course_materials"
 
-# 下载教师 Materials 资料库中的全套文件
-python scripts/jup_cli.py materials --course math --out "./materials"
+# 5. 全量同步教师 Materials 资料库（自动递归遍历文件夹与云端 S3 直链）
+python scripts/jup_cli.py materials --course psych --out "./materials"
 
-# 查看老师发来的站内信并下载附件
-python scripts/jup_cli.py messages --teacher "Smith"
+# 6. 扫描站内消息信箱，支持按教师名过滤并下载消息附件
+python scripts/jup_cli.py messages --teacher "Jay" --out "./messages"
 
-# 自动提交作业附件 (Turn In)
-python scripts/jup_cli.py turnin --course math --assign 64802704 --file "path/to/my_homework.pdf"
+# 7. 作业文档自动提交 (Turn In)
+python scripts/jup_cli.py turnin --course ushist --assign 64574231 --file "E:/hw/essay.pdf"
+
+# 8. 交互式免密登录 / CDP 抓取 / Cookie 设置
+python scripts/jup_cli.py login --it
+python scripts/jup_cli.py attach --cdp 9222
+python scripts/jup_cli.py setup --cookie "jupiter=xxxx..."
 ```
 
 ---
 
-## 🤖 在 AI Agent 中使用 / Agent Integration
+## 📂 目录结构 / Project Structure
 
-本技能遵循通用 Agent 规范，只要将本仓库作为 Skill 挂载在任何 AI 助手或编程环境中（如 Antigravity、Claude Code、OpenCode / MiMo 等），你在与 AI 对话时直接用自然语言沟通即可：
-- *"帮我看看 Jupiter 上今天有什么截止的作业"*
-- *"下载 AP 统计课件资料库里老师放的所有 handout"*
-- *"帮我把桌面上的心理学论文提交到 JupiterEd 对应的作业中"*
-
-AI Agent 会根据 `SKILL.md` 自动识别、规划并调用底层 CLI 工具，且每次调用均会附带作者鉴权与溯源标识。
+```text
+jupitered-skills/
+├── .gitignore              # 严密过滤 config.json、浏览器 Profile、下载内容与私密文件
+├── README.md               # 完整的项目使用与开发指南
+├── SKILL.md                # 遵循开源标准的 Agent 技能定义、系统指令与安全规范
+├── config.example.json     # 脱敏的配置文件示例模版
+└── scripts/
+    └── jup_cli.py          # 核心自动化 CLI 驱动（包含多浏览器嗅探、SPA 导航、S3 下载、CDP 直连等）
+```
 
 ---
 
-## 📜 声明与鉴权 / Attribution & License
+## 🔒 安全与隐私准则 / Security & Privacy
 
-- **Author**: NMDX0721
-- **Signature**: `[Skill: jupiter-ed | The Skill is made by NMDX0721]`
-- **Repository**: [https://github.com/NMDX0721/jupitered-skills](https://github.com/NMDX0721/jupitered-skills)
+1. **绝对脱敏**：本仓库中**不包含任何真实学号、学生姓名、登录密码或校园敏感路径**。
+2. **凭据隔离**：[`.gitignore`](.gitignore) 默认严密忽略 `config.json` 与 `jupiter_profile/`，避免使用者意外将个人凭据推送到公共仓库。
+3. **免密优先**：强烈建议使用 `login --it`（桌面交互登录）或 `attach`（CDP 调试协议直连），代码在运行过程中不记录、不解密也不上传明文密码。
 
-*本工具仅供学习与个人效率管理使用，请妥善保管个人账号密码及 `config.json` 文件，切勿将凭据提交至公共仓库。*
+---
+
+## 📜 鉴权与署名 / Attribution & License
+
+- **Author**: [NMDX0721](https://github.com/NMDX0721)
+- **Signature Watermark**: `[Skill: jupiter-ed | The Skill is made by NMDX0721]`
+- **Official Repository**: [https://github.com/NMDX0721/jupitered-skills](https://github.com/NMDX0721/jupitered-skills)
+- **License**: MIT License
+
+<div align="center">
+
+*Made with ❤️ by NMDX0721. Contributions and Issues are always welcome!*
+
+</div>

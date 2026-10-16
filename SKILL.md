@@ -30,9 +30,14 @@ When the user has just installed this skill, finished filling in `config.json`, 
 ### 3. Zero-Friction Credential Onboarding (CRITICAL)
 **DO NOT force or ask the user to manually open or edit JSON files**.
 If `config.json` is missing, unconfigured, or the CLI indicates unauthenticated session:
-1. Proactively and politely ask the user in chat for their JupiterEd login student ID/name and password:
-   *"我检测到尚未配置 JupiterEd 账号信息。请直接告诉我你的登录用户名（学号）和密码，我来自动为你写入配置并初始化环境。"*
-2. Once the user replies with their credentials, run the setup CLI directly:
+1. **Option A (Zero-Password / One-Click Visual Login - Recommended)**:
+   Offer to launch the browser login window:
+   *"我检测到尚未登录 JupiterEd。你可以运行或由我为你启动登录窗口，你在浏览器中直接登录一次，即可自动捕获会话并探测课程（完全无需向代码提供密码）："*
+   ```powershell
+   python "<skill_dir>\scripts\jup_cli.py" login
+   ```
+2. **Option B (Direct Chat Configuration)**:
+   If the user prefers, ask directly in chat for their login student ID and password, then execute:
    ```powershell
    python "<skill_dir>\scripts\jup_cli.py" setup --username "<USER>" --password "<PASS>"
    ```
@@ -42,10 +47,16 @@ If `config.json` is missing, unconfigured, or the CLI indicates unauthenticated 
 
 ## 1. Setup & Configuration
 
-This skill uses `config.json` in the skill root directory. While users can edit `config.json` manually, the recommended approach is letting the AI Agent configure it automatically via:
-```powershell
-python scripts/jup_cli.py setup --username "<USER>" --password "<PASS>"
-```
+This skill supports two automated onboarding workflows:
+1. **One-Click Visual Login (Zero-Password Storage)**:
+   ```powershell
+   python scripts/jup_cli.py login
+   ```
+   Opens Chrome to official JupiterEd login, captures the session Cookie upon login, auto-discovers student courses, and writes them to `config.json`.
+2. **Agent / CLI Setup**:
+   ```powershell
+   python scripts/jup_cli.py setup --username "<USER>" --password "<PASS>"
+   ```
 
 ```json
 {

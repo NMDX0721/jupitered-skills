@@ -111,7 +111,7 @@ def download_s3_file(url, filename, out_dir):
         print(f"    [FAILED] {clean_fn}")
         return None
 
-def create_context(playwright, cfg, headless=True):
+def create_context(playwright, cfg, headless=True, auto_login=True):
     chrome_exe = cfg.get("chrome_path", r"C:\Program Files\Google\Chrome\Application\chrome.exe")
     profile_dir = cfg.get("profile_dir", "./jupiter_profile")
     login_url = cfg.get("login_url", "https://login.jupitered.com/login/index.php")
@@ -134,18 +134,26 @@ def create_context(playwright, cfg, headless=True):
     ctx = playwright.chromium.launch_persistent_context(**launch_kwargs)
     page = ctx.pages[0] if ctx.pages else ctx.new_page()
     page.goto(login_url, wait_until="domcontentloaded", timeout=45000)
-    time.sleep(4)
+    time.sleep(3)
+
+    if not auto_login:
+        return ctx, page
 
     # Check session expiry / login needed
     pwd_field = page.query_selector("#text_password1")
     if pwd_field:
         if not username or not password or username == "YOUR_STUDENT_ID_OR_NAME":
-            print("!! ERROR: Jupiter session requires login, but credentials in config.json are missing or default.")
-            print("!! Please update config.json with your actual student username and password.")
+            print("\n" + "=" * 68)
+            print("!! 当前 JupiterEd 会话未登录或已过期。")
+            print("👉 推荐免密方式：运行以下命令在浏览器中一键登录（无需保存明文密码）：")
+            print("   python scripts/jup_cli.py login")
+            print("👉 或者运行配置命令写入账号密码：")
+            print("   python scripts/jup_cli.py setup --username <USER> --password <PASS>")
+            print("=" * 68 + "\n")
             ctx.close()
             sys.exit(1)
 
-        print("[*] Session expired or unauthenticated. Attempting login...")
+        print("[*] Session expired or unauthenticated. Attempting auto-login with stored credentials...")
         stud_field = page.query_selector("#text_studid1")
         if stud_field:
             stud_field.fill("")
@@ -156,7 +164,7 @@ def create_context(playwright, cfg, headless=True):
             login_btn.click()
             time.sleep(5)
         if page.query_selector("#text_password1"):
-            print("!! ERROR: Auto-login failed. Please verify credentials in config.json.")
+            print("!! ERROR: Auto-login failed. Please verify credentials in config.json or run 'login' action.")
             ctx.close()
             sys.exit(1)
         print("[+] Login succeeded.")
@@ -659,11 +667,100 @@ def action_setup(args):
     github_url = cfg.get("github_repo", DEFAULT_GITHUB_REPO)
     check_first_run_notice(base_dir, github_url)
 
+def discover_courses_from_page(page):
+    return page.evaluate("""() => {
+        const map = {};
+        document.querySelectorAll('[click]').forEach(el => {
+            const c = el.getAttribute('click') || '';
+            const m = c.match(/postval\\('class1',\\s*(\\d+)\\)/);
+            if (m) {
+                const txt = el.innerText.trim();
+                if (txt && !txt.includes('\\n')) {
+                    const cleanName = txt.toLowerCase().replace(/[^a-z0-9]/g, '');
+                    if (cleanName && cleanName.length > 1) {
+                        map[cleanName] = parseInt(m[1]);
+                        map[txt] = parseInt(m[1]);
+                    }
+                }
+            }
+        });
+        return map;
+    }""")
+
+def action_login(args):
+    base_dir = get_base_dir()
+    cfg_file = os.path.join(base_dir, "config.json")
+    example_file = os.path.join(base_dir, "config.example.json")
+
+    cfg = {}
+    if os.path.exists(cfg_file):
+        try:
+            with open(cfg_file, "r", encoding="utf-8") as f:
+                cfg = json.load(f)
+        except Exception:
+            cfg = {}
+    elif os.path.exists(example_file):
+        try:
+            with open(example_file, "r", encoding="utf-8") as f:
+                cfg = json.load(f)
+        except Exception:
+            cfg = {}
+
+    print("=" * 68)
+    print("🌟 JupiterEd 一键可视化免密登录 (One-Click Session Capture)")
+    print("=" * 68)
+    print("[*] 正在打开 Chrome 浏览器窗口...")
+    print("[*] 说明：本脚本完全不会获取或记录您的登录密码。")
+    print("[*] 请在弹出的官方登录页面中完成登录（支持浏览器自动填充/记住密码/SSO）。")
+    print("[*] 登录完成后，脚本将自动捕获会话 Cookie、探测所选课程并自动关闭窗口...\n")
+
+    with sync_playwright() as p:
+        ctx, page = create_context(p, cfg, headless=False, auto_login=False)
+        try:
+            logged_in = False
+            for _ in range(180):  # Wait up to 3 minutes
+                time.sleep(1.5)
+                try:
+                    if not ctx.pages:
+                        break
+                    pwd_field = page.query_selector("#text_password1")
+                    cookies = ctx.cookies()
+                    has_jup = any(c.get('name') == 'jupiter' for c in cookies)
+                    if not pwd_field and has_jup:
+                        wait_for_loading(page)
+                        logged_in = True
+                        break
+                except Exception:
+                    break
+
+            if not logged_in:
+                print("!! 未检测到登录完成或浏览器窗口已关闭。")
+                return
+
+            print("\n[+] 🎉 登录成功！已安全捕获并持久化存储会话 Cookie。")
+
+            print("[*] 正在自动探测你本学期的课程列表与 Course ID...")
+            time.sleep(2)
+            course_map = discover_courses_from_page(page)
+            if course_map:
+                print(f"[+] 成功识别 {len(course_map)//2} 门选修课程！已自动生成映射表。")
+                cfg["course_ids"] = course_map
+
+            # Save configuration
+            with open(cfg_file, "w", encoding="utf-8") as f:
+                json.dump(cfg, f, indent=2, ensure_ascii=False)
+            print(f"[+] 配置与课程映射表已更新至: {cfg_file}")
+
+            github_url = cfg.get("github_repo", DEFAULT_GITHUB_REPO)
+            check_first_run_notice(base_dir, github_url)
+        finally:
+            ctx.close()
+
 def main():
     parser = argparse.ArgumentParser(description=f"JupiterEd Automation CLI (Release Edition) - {ATTRIBUTION_SIGNATURE}")
     parser.add_argument(
         "action",
-        choices=["todo", "grades", "detail", "download-assign", "materials", "messages", "turnin", "setup"],
+        choices=["todo", "grades", "detail", "download-assign", "materials", "messages", "turnin", "setup", "login"],
         help="Action to perform"
     )
     parser.add_argument("--course", help="Course name or Course ID (e.g. psych, ushist, 6298933)")
@@ -683,6 +780,9 @@ def main():
 
     if args.action == "setup":
         action_setup(args)
+        return
+    elif args.action == "login":
+        action_login(args)
         return
 
     cfg, _ = load_config(args.config)

@@ -49,38 +49,43 @@ cd jupitered-skills
 
 ## ⚙️ 配置指引 / Configuration
 
-本项目支持三种配置方式，**最推荐直接让 AI Agent 帮你配置**，无需繁琐的手动编辑：
+本项目支持多种灵活配置方式，**最推荐免密模式，无需在代码或文件中记录你的登录密码**：
 
-### 方式 1：AI Agent 对话式自动配置（最推荐，零门槛）
-如果你在使用 **Antigravity**、**Claude Code**、**Cursor** 或 **OpenCode** 等 AI 助手：
-你**完全不需要手动打开或编辑 JSON 文件**，只需直接对 AI 发送：
-> 💬 *“帮我配置 JupiterEd，账号是 123456，密码是 my_password”*  
-> 💬 或者直接提需求：*“帮我查下这周截止的作业”*（AI 检测到未配置时，会自动在对话中向你询问账号并一键初始化完成）。
+### 方式 1：一键可视化免密登录（🌟 最安全推荐，零密码泄露风险）
+如果你不想在任何配置文件或对话框中输入明文密码，或者平时在浏览器中已开启了“记住密码/自动填充/学校SSO”：
+```powershell
+python scripts/jup_cli.py login
+```
+* **完全透明安全**：弹出一个干净的 Chrome 窗口访问 Jupiter 官方登录页。你在页面上亲自完成登录（支持自动填充与单点登录）。
+* **自动捕获会话与课程**：登录成功瞬间，脚本自动捕获 session cookie 并**自动探测本学期所有选修科目与 Course ID**，窗口随后自动关闭。代码**完全不读取、不解密、不存储你的密码**！
+* 之后的所有查询与作业提交操作均完全无头、静默在后台运行。
 
 ---
 
-### 方式 2：CLI 命令行交互向导 / 命令行参数
-如果你直接在终端使用，可以直接运行配置向导或直接传参：
+### 方式 2：AI Agent 对话式自动配置
+如果你在使用 **Antigravity**、**Claude Code**、**Cursor** 或 **OpenCode** 等 AI 助手：
+你**完全不需要手动打开或编辑 JSON 文件**，只需直接对 AI 发送：
+> 💬 *“帮我配置 JupiterEd，账号是 123456，密码是 my_password”*  
+> 💬 或者直接提需求：*“帮我查下这周截止的作业”*（AI 检测到未登录时，会自动提示你运行 `login` 窗口或在对话中协助你一键初始化完成）。
+
+---
+
+### 方式 3：命令行参数 / 交互式向导
+如果你习惯在终端管理：
 ```powershell
 # 交互式向导（提示输入账号与隐式密码）
 python scripts/jup_cli.py setup
 
-# 或者一条命令直接写入并校验
-python scripts/jup_cli.py setup --username "你的学号或用户名" --password "你的密码"
+# 或一条命令直接写入并校验
+python scripts/jup_cli.py setup --username "你的学号" --password "你的密码"
 ```
 
 ---
 
-### 方式 3：手动编辑配置文件
-1. 复制模版文件：
-   ```bash
-   cp config.example.json config.json
-   ```
-2. 编辑 `config.json` 填入 `username` 与 `password`。
-3. 运行校验：
-   ```powershell
-   python scripts/jup_cli.py setup
-   ```
+### 方式 4：手动编辑配置文件
+1. 复制模版：`cp config.example.json config.json`
+2. 编辑 `config.json` 填入必要字段。
+3. 运行校验：`python scripts/jup_cli.py setup`
 
 > 💡 **配置成功提示**：首次配置完成后将弹出友好提示：  
 > `🎉 恭喜配置完成！返回项目 GitHub 仓库链接获取更多内容与更新: https://github.com/NMDX0721/jupitered-skills`

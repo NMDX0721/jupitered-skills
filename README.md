@@ -57,40 +57,34 @@
 
 ```mermaid
 flowchart TD
-    subgraph UserSpace [User Interaction]
-        Prompt["User Intent: Check upcoming homework / Download handouts"]
+    subgraph S1 ["1. AI Agent Ecosystem"]
+        direction LR
+        Prompt["Natural Language Intent"] --> Agent["AI Assistant (Antigravity / Claude / Cursor)"]
+        Agent --> Skill["SKILL.md (Rules & Discovery)"]
     end
 
-    subgraph AgentSpace [AI Agent Ecosystem]
-        Agent["AI Coding Assistant (Antigravity / Claude / Cursor / OpenCode)"]
-        SkillInterface["Skill Interface (SKILL.md): Parameter Mapping and Attribution"]
-        Agent --> SkillInterface
+    subgraph S2 ["2. Core Execution Engine (scripts/jup_cli.py)"]
+        direction LR
+        CLI["CLI Command Dispatcher"]
+        Auth["Auth Manager (Windows IT / CDP / Cookie)"]
+        Browser["Playwright Engine (Edge & Chrome)"]
+        CLI --> Auth
+        CLI --> Browser
     end
 
-    subgraph CoreSpace [Core Execution Engine]
-        CLI["CLI Command Dispatcher (scripts/jup_cli.py)"]
-        AuthMgr["Auth Manager: Interactive Token / CDP / Cookie Profile"]
-        BrowserEngine["Playwright Automation Engine (Edge / Chrome)"]
-        CLI --> AuthMgr
-        CLI --> BrowserEngine
-    end
-
-    subgraph PortalSpace [JupiterEd Student Portal]
-        Portal["JupiterEd Web Portal (login.jupitered.com)"]
-        ToDo["To Do List and Quarter Grades"]
-        OpenMat["SPA openmat() Attachments Resolver"]
-        Materials["Materials Direct AWS S3 Handouts"]
-        TurnIn["Homework Turn-In Dispatcher"]
-
+    subgraph S3 ["3. JupiterEd Student Portal & Cloud"]
+        direction LR
+        Portal["login.jupitered.com"]
+        ToDo["To-Do & Grades"]
+        Mat["Materials S3 Handouts"]
+        TurnIn["Homework Turn-In"]
         Portal --> ToDo
-        Portal --> OpenMat
-        Portal --> Materials
+        Portal --> Mat
         Portal --> TurnIn
     end
 
-    Prompt --> Agent
-    SkillInterface --> CLI
-    BrowserEngine --> Portal
+    Skill --> CLI
+    Browser --> Portal
 ```
 
 ---

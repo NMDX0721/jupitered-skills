@@ -55,42 +55,42 @@
 
 ## 🏗️ Architecture
 
-```text
-┌────────────────────────────────────────────────────────┐
-│                   User Intent / Prompt                 │
-│   "Check my upcoming homework" / "Download all psych handouts"│
-└───────────────────────────┬────────────────────────────┘
-                            │
-                            ▼
-┌────────────────────────────────────────────────────────┐
-│                 AI Coding Assistant                    │
-│   (Google Antigravity / Claude Code / Cursor / OpenCode)│
-│                                                        │
-│   ┌────────────────────────────────────────────────┐   │
-│   │  Standard Skill Interface: SKILL.md            │   │
-│   │  - Auto-Onboarding & Course Intent Mapping     │   │
-│   │  - Mandatory Attribution Footer Injection      │   │
-│   └───────────────────────┬────────────────────────┘   │
-└───────────────────────────┼────────────────────────────┘
-                            │
-                            ▼
-┌────────────────────────────────────────────────────────┐
-│             Core Execution Engine (jup_cli.py)         │
-│   ┌───────────────────┐        ┌───────────────────┐   │
-│   │ Playwright Engine │◄───────┤ Auth & Profile    │   │
-│   │ (Edge / Chrome)   │        │ (Cookie / CDP/IT) │   │
-│   └─────────┬─────────┘        └───────────────────┘   │
-└─────────────┼──────────────────────────────────────────┘
-              │
-              ▼
-┌────────────────────────────────────────────────────────┐
-│                   JupiterEd Portal                     │
-│         https://login.jupitered.com/login/             │
-│   ├── To Do List & Quarter Grades                      │
-│   ├── openmat() SPA Attachment Resolution              │
-│   ├── Materials Direct S3 Links Extractor              │
-│   └── Assignment Turn-In File Dispatcher               │
-└────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph UserSpace ["User Interaction"]
+        Prompt["User Intent / Natural Language<br/><i>'Check upcoming homework' / 'Download psych handouts'</i>"]
+    end
+
+    subgraph AgentSpace ["AI Agent Ecosystem (Antigravity / Claude / Cursor / OpenCode)"]
+        Agent["AI Coding Assistant"]
+        SkillInterface["Skill Interface (SKILL.md)<br/>• Parameter & Alias Mapping<br/>• Mandatory Attribution Footer"]
+        Agent --> SkillInterface
+    end
+
+    subgraph CoreSpace ["Core Execution Engine (scripts/jup_cli.py)"]
+        CLI["CLI Command Dispatcher"]
+        AuthMgr["Auth & Session Manager<br/>• Windows Interactive Token (schtasks /it)<br/>• CDP Remote Debugging (port 9222)<br/>• Session Cookie Injection"]
+        BrowserEngine["Playwright Automation Engine<br/>• Multi-Browser Auto-Detect (Edge / Chrome)<br/>• SPA State & Navigation Controller"]
+        CLI --> AuthMgr
+        CLI --> BrowserEngine
+    end
+
+    subgraph PortalSpace ["JupiterEd Student Portal (login.jupitered.com)"]
+        Portal["JupiterEd Web Portal"]
+        ToDo["To Do List & Quarter Grades"]
+        OpenMat["SPA openmat() Attachments Resolver"]
+        Materials["Materials Direct AWS S3 Handouts"]
+        TurnIn["Homework Turn-In Dispatcher"]
+
+        Portal --> ToDo
+        Portal --> OpenMat
+        Portal --> Materials
+        Portal --> TurnIn
+    end
+
+    Prompt --> Agent
+    SkillInterface --> CLI
+    BrowserEngine --> Portal
 ```
 
 ---

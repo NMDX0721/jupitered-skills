@@ -55,42 +55,42 @@
 
 ## 🏗️ 工作架构 / Architecture
 
-```text
-┌────────────────────────────────────────────────────────┐
-│                   User Intent / Prompt                 │
-│   "帮我查下这周截止的作业" / "下载心理学所有 handout"     │
-└───────────────────────────┬────────────────────────────┘
-                            │
-                            ▼
-┌────────────────────────────────────────────────────────┐
-│                 AI Coding Assistant                    │
-│   (Google Antigravity / Claude Code / Cursor / OpenCode)│
-│                                                        │
-│   ┌────────────────────────────────────────────────┐   │
-│   │  Standard Skill Interface: SKILL.md            │   │
-│   │  - Auto-Onboarding & Course Intent Mapping     │   │
-│   │  - Watermark & Attribution Footer Injection    │   │
-│   └───────────────────────┬────────────────────────┘   │
-└───────────────────────────┼────────────────────────────┘
-                            │
-                            ▼
-┌────────────────────────────────────────────────────────┐
-│             Core Execution Engine (jup_cli.py)         │
-│   ┌───────────────────┐        ┌───────────────────┐   │
-│   │ Playwright Engine │◄───────┤ Auth & Profile    │   │
-│   │ (Edge / Chrome)   │        │ (Cookie / CDP/IT) │   │
-│   └─────────┬─────────┘        └───────────────────┘   │
-└─────────────┼──────────────────────────────────────────┘
-              │
-              ▼
-┌────────────────────────────────────────────────────────┐
-│                   JupiterEd Portal                     │
-│         https://login.jupitered.com/login/             │
-│   ├── To Do List & Quarter Grades                      │
-│   ├── openmat() SPA Attachment Resolution              │
-│   ├── Materials Direct S3 Links Extractor              │
-│   └── Assignment Turn-In File Dispatcher               │
-└────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph UserSpace ["用户交互层 (User Interaction)"]
+        Prompt["用户自然语言指令 (User Prompt)<br/><i>'帮我查下这周截止的作业' / '下载心理学所有 handout'</i>"]
+    end
+
+    subgraph AgentSpace ["AI Agent 生态层 (Antigravity / Claude / Cursor / OpenCode)"]
+        Agent["AI 编程助手"]
+        SkillInterface["标准化技能规范 (SKILL.md)<br/>• 学科意图与别名解析<br/>• 自动化鉴权水印注入"]
+        Agent --> SkillInterface
+    end
+
+    subgraph CoreSpace ["核心执行引擎 (scripts/jup_cli.py)"]
+        CLI["CLI 统一命令调度器"]
+        AuthMgr["鉴权与会话管理中心<br/>• Windows 交互令牌桌面穿透 (schtasks /it)<br/>• CDP 浏览器远程调试直连<br/>• 会话 Cookie 持久化与嗅探"]
+        BrowserEngine["Playwright 自动化引擎<br/>• Edge / Chrome 双浏览器自动适配<br/>• SPA 单页路由与状态控制器"]
+        CLI --> AuthMgr
+        CLI --> BrowserEngine
+    end
+
+    subgraph PortalSpace ["JupiterEd 学生端门户 (login.jupitered.com)"]
+        Portal["JupiterEd Web 门户"]
+        ToDo["To Do 待办清单与学期 GPA"]
+        OpenMat["SPA openmat() 课件直链解析器"]
+        Materials["Materials 教师资料库 (AWS S3 直连)"]
+        TurnIn["作业自动提交管道 (Turn In)"]
+
+        Portal --> ToDo
+        Portal --> OpenMat
+        Portal --> Materials
+        Portal --> TurnIn
+    end
+
+    Prompt --> Agent
+    SkillInterface --> CLI
+    BrowserEngine --> Portal
 ```
 
 ---

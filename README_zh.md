@@ -56,6 +56,13 @@
 ## 🏗️ 工作架构 / Architecture
 
 ```mermaid
+%%{init: {
+  "flowchart": {
+    "diagramPadding": 45,
+    "nodeSpacing": 15,
+    "rankSpacing": 35
+  }
+}}%%
 flowchart LR
     User["👤 用户自然语言意图"] --> Agent["🤖 AI 编程助手 + SKILL.md"]
     Agent --> CLI["⚡ CLI 调度器 (jup_cli.py)"]

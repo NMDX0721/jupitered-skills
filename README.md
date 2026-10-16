@@ -56,6 +56,13 @@
 ## 🏗️ Architecture
 
 ```mermaid
+%%{init: {
+  "flowchart": {
+    "diagramPadding": 45,
+    "nodeSpacing": 15,
+    "rankSpacing": 35
+  }
+}}%%
 flowchart LR
     User["👤 User Prompt"] --> Agent["🤖 AI Assistant + SKILL.md"]
     Agent --> CLI["⚡ CLI Dispatcher (jup_cli.py)"]
@@ -64,7 +71,7 @@ flowchart LR
     Auth -.-> Browser
     Browser --> Portal[("🏫 JupiterEd Portal")]
     Portal --> ToDo["📚 To-Do & Grades"]
-    Portal --> Mat["📦 Materials S3 Sync"]
+    Portal --> Mat["📦 Materials S3"]
     Portal --> TurnIn["📤 Homework Turn-In"]
 ```
 

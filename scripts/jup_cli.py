@@ -111,8 +111,24 @@ def download_s3_file(url, filename, out_dir):
         print(f"    [FAILED] {clean_fn}")
         return None
 
+def detect_browser_executable(configured_path=None):
+    if configured_path and os.path.exists(configured_path):
+        return configured_path
+    candidates = [
+        r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
+        r"C:\Program Files\Microsoft\Edge\Application\msedge.exe",
+        r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+        r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
+        os.path.expandvars(r"%LOCALAPPDATA%\Microsoft\Edge\Application\msedge.exe"),
+        os.path.expandvars(r"%LOCALAPPDATA%\Google\Chrome\Application\chrome.exe")
+    ]
+    for p in candidates:
+        if os.path.exists(p):
+            return p
+    return None
+
 def create_context(playwright, cfg, headless=True, auto_login=True):
-    chrome_exe = cfg.get("chrome_path", r"C:\Program Files\Google\Chrome\Application\chrome.exe")
+    browser_exe = detect_browser_executable(cfg.get("browser_path") or cfg.get("chrome_path"))
     profile_dir = cfg.get("profile_dir", "./jupiter_profile")
     login_url = cfg.get("login_url", "https://login.jupitered.com/login/index.php")
     username = cfg.get("username", "").strip()
@@ -133,8 +149,8 @@ def create_context(playwright, cfg, headless=True, auto_login=True):
     else:
         launch_kwargs["viewport"] = {"width": 1280, "height": 900}
 
-    if chrome_exe and os.path.exists(chrome_exe):
-        launch_kwargs["executable_path"] = chrome_exe
+    if browser_exe:
+        launch_kwargs["executable_path"] = browser_exe
 
     ctx = playwright.chromium.launch_persistent_context(**launch_kwargs)
     page = ctx.pages[0] if ctx.pages else ctx.new_page()

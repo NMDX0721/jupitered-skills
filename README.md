@@ -1,4 +1,4 @@
-# JupiterEd Automation Skills (Antigravity Edition)
+# JupiterEd Automation Skills (Universal Edition)
 
 > 🚀 **The Skill is made by NMDX0721**  
 > GitHub Repository: [https://github.com/NMDX0721/jupitered-skills](https://github.com/NMDX0721/jupitered-skills)
@@ -7,9 +7,11 @@
 
 ## 📖 简介 / Overview
 
-本项目是专为 **Google Antigravity** 与 AI 编程助手打造的 **JupiterEd 学生端自动化技能 (Skill)**。
+本项目是一个**通用的 JupiterEd 学生端自动化工具与 AI Agent 技能**。
 
-通过底层基于 **Playwright** 的无头/有头浏览器与持久化会话机制，本 Skill 能够安全、高效地自动化处理 JupiterEd (login.jupitered.com) 的各项日常学业事务：
+无论你是直接在终端将其作为**独立命令行工具 (CLI)** 使用，还是接入各类 **AI 编程助手与 Agent 生态（如 Google Antigravity、Claude Code、Cursor、OpenCode / MiMo 等）**，均可实现开箱即用的学业自动化。
+
+通过底层基于 **Playwright** 的无头/有头浏览器与持久化会话机制，本工具能够安全、高效地处理 JupiterEd (login.jupitered.com) 的各项学业事务：
 - 📊 **待办与成绩查询**：实时抓取 To Do 待办清单与各科目当前 GPA/Quarter 成绩。
 - 🔍 **作业详情与课件探测**：自动解析 SPA 页面中隐藏的 `openmat()` 课件，直接定位底层 AWS S3 直链高速下载。
 - 📁 **教师 Materials 资料库全量同步**：深度递归遍历教师共享文件目录与云端 handout 讲义。
@@ -18,26 +20,30 @@
 
 ---
 
-## 🛠️ 安装指引 / Installation
+## 🛠️ 安装与部署 / Installation & Deployment
 
-### 1. 安装 Python 依赖
+### 1. 安装基础依赖
 ```bash
 pip install playwright
 playwright install chromium
 ```
 
-### 2. 部署 Skill 到 Antigravity
-你可以将本仓库直接克隆到 Antigravity 的技能目录中：
+### 2. 获取代码与部署
 
-**全局生效**（推荐，所有工作区可用）：
+#### 方式 A：作为独立 CLI 命令行工具使用
+直接克隆到本地任意目录使用：
 ```bash
-git clone https://github.com/NMDX0721/jupitered-skills.git ~/.gemini/antigravity/skills/jupiter-ed
+git clone https://github.com/NMDX0721/jupitered-skills.git
+cd jupitered-skills
 ```
 
-**项目生效**（仅在当前项目工作区生效）：
-```bash
-git clone https://github.com/NMDX0721/jupitered-skills.git .agents/skills/jupiter-ed
-```
+#### 方式 B：作为 AI Agent Skill 技能集成
+本技能遵循标准化 Agent Skill 规范（包含 `SKILL.md` 指南与 CLI 工具）：
+* **Google Antigravity / Gemini**：
+  * 全局生效：`git clone https://github.com/NMDX0721/jupitered-skills.git ~/.gemini/antigravity/skills/jupiter-ed`
+  * 项目生效：`git clone https://github.com/NMDX0721/jupitered-skills.git .agents/skills/jupiter-ed`
+* **Claude Code / OpenCode / 其他 Agent**：
+  * 克隆至工作区或全局 Skill 目录，Agent 会自动根据 `SKILL.md` 加载与调度工具。
 
 ---
 
@@ -102,12 +108,12 @@ python scripts/jup_cli.py turnin --course math --assign 64802704 --file "path/to
 
 ## 🤖 在 AI Agent 中使用 / Agent Integration
 
-只要将本 Skill 放置在 Antigravity 的 `skills/` 目录下，你在与 Antigravity 交互时直接用自然语言沟通即可：
+本技能遵循通用 Agent 规范，只要将本仓库作为 Skill 挂载在任何 AI 助手或编程环境中（如 Antigravity、Claude Code、OpenCode / MiMo 等），你在与 AI 对话时直接用自然语言沟通即可：
 - *"帮我看看 Jupiter 上今天有什么截止的作业"*
 - *"下载 AP 统计课件资料库里老师放的所有 handout"*
 - *"帮我把桌面上的心理学论文提交到 JupiterEd 对应的作业中"*
 
-AI Agent 会自动识别并调用本 Skill，且每次调用均会带上作者鉴权与溯源标识。
+AI Agent 会根据 `SKILL.md` 自动识别、规划并调用底层 CLI 工具，且每次调用均会附带作者鉴权与溯源标识。
 
 ---
 

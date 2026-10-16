@@ -688,6 +688,10 @@ def discover_courses_from_page(page):
     }""")
 
 def action_login(args):
+    if args.cdp:
+        action_attach(args)
+        return
+
     base_dir = get_base_dir()
     cfg_file = os.path.join(base_dir, "config.json")
     example_file = os.path.join(base_dir, "config.example.json")
@@ -756,11 +760,103 @@ def action_login(args):
         finally:
             ctx.close()
 
+def action_attach(args):
+    cdp_input = args.cdp or "http://localhost:9222"
+    if cdp_input.isdigit():
+        cdp_url = f"http://localhost:{cdp_input}"
+    elif not cdp_input.startswith("http://") and not cdp_input.startswith("ws://"):
+        cdp_url = f"http://{cdp_input}"
+    else:
+        cdp_url = cdp_input
+
+    base_dir = get_base_dir()
+    cfg_file = os.path.join(base_dir, "config.json")
+    example_file = os.path.join(base_dir, "config.example.json")
+
+    cfg = {}
+    if os.path.exists(cfg_file):
+        try:
+            with open(cfg_file, "r", encoding="utf-8") as f:
+                cfg = json.load(f)
+        except Exception:
+            cfg = {}
+    elif os.path.exists(example_file):
+        try:
+            with open(example_file, "r", encoding="utf-8") as f:
+                cfg = json.load(f)
+        except Exception:
+            cfg = {}
+
+    print("=" * 68)
+    print("🔗 JupiterEd 浏览器 CDP 直连同步 (Chrome DevTools Protocol)")
+    print("=" * 68)
+    print(f"[*] 正在尝试连接本地已运行的 Chrome 实例: {cdp_url}")
+    print("[*] 提示：需先以调试端口启动 Chrome（例如：chrome.exe --remote-debugging-port=9222）\n")
+
+    with sync_playwright() as p:
+        try:
+            browser = p.chromium.connect_over_cdp(cdp_url)
+        except Exception as e:
+            print(f"!! 无法连接至 {cdp_url}: {e}")
+            print("!! 请确认 Chrome 是否已启用远程调试端口，或直接运行推荐的一键免密登录：")
+            print("   python scripts/jup_cli.py login")
+            return
+
+        try:
+            if not browser.contexts:
+                print("!! 未发现活动的浏览器上下文。")
+                return
+
+            ctx = browser.contexts[0]
+            cookies = ctx.cookies(["https://login.jupitered.com"])
+            jup_cookies = [c for c in cookies if c.get("name") == "jupiter"]
+            if not jup_cookies:
+                print("[!] 连接成功，但未在该 Chrome 实例中找到 JupiterEd 的已登录会话。")
+                print("[!] 请确保你在该 Chrome 中打开并登录了 login.jupitered.com。")
+                return
+
+            print(f"[+] 成功捕获到 {len(cookies)} 个 Jupiter 会话 Cookie！")
+
+            jupiter_page = None
+            for page in ctx.pages:
+                if "jupiter" in page.url.lower():
+                    jupiter_page = page
+                    break
+
+            if jupiter_page:
+                print("[*] 检测到已打开的 JupiterEd 页面，正在自动提取选课列表...")
+                course_map = discover_courses_from_page(jupiter_page)
+                if course_map:
+                    print(f"[+] 成功识别 {len(course_map)//2} 门选修课程！")
+                    cfg["course_ids"] = course_map
+
+            profile_dir = cfg.get("profile_dir", "./jupiter_profile")
+            abs_profile = os.path.abspath(os.path.expanduser(profile_dir))
+            os.makedirs(abs_profile, exist_ok=True)
+
+            chrome_exe = cfg.get("chrome_path", r"C:\Program Files\Google\Chrome\Application\chrome.exe")
+            launch_kwargs = {"user_data_dir": abs_profile, "headless": True}
+            if chrome_exe and os.path.exists(chrome_exe):
+                launch_kwargs["executable_path"] = chrome_exe
+
+            p_ctx = p.chromium.launch_persistent_context(**launch_kwargs)
+            p_ctx.add_cookies(cookies)
+            p_ctx.close()
+
+            with open(cfg_file, "w", encoding="utf-8") as f:
+                json.dump(cfg, f, indent=2, ensure_ascii=False)
+            print(f"[+] 会话 Cookie 与配置已无缝同步保存至: {cfg_file}")
+
+            github_url = cfg.get("github_repo", DEFAULT_GITHUB_REPO)
+            check_first_run_notice(base_dir, github_url)
+        finally:
+            browser.close()
+
 def main():
     parser = argparse.ArgumentParser(description=f"JupiterEd Automation CLI (Release Edition) - {ATTRIBUTION_SIGNATURE}")
     parser.add_argument(
         "action",
-        choices=["todo", "grades", "detail", "download-assign", "materials", "messages", "turnin", "setup", "login"],
+        choices=["todo", "grades", "detail", "download-assign", "materials", "messages", "turnin", "setup", "login", "attach"],
         help="Action to perform"
     )
     parser.add_argument("--course", help="Course name or Course ID (e.g. psych, ushist, 6298933)")
@@ -772,6 +868,7 @@ def main():
     parser.add_argument("--config", help="Path to custom config.json")
     parser.add_argument("--username", help="Student username/ID (for setup)")
     parser.add_argument("--password", help="Student password (for setup)")
+    parser.add_argument("--cdp", help="Remote debugging port or URL (e.g. 9222 or http://localhost:9222) for attach")
 
     args = parser.parse_args()
 
@@ -783,6 +880,9 @@ def main():
         return
     elif args.action == "login":
         action_login(args)
+        return
+    elif args.action == "attach":
+        action_attach(args)
         return
 
     cfg, _ = load_config(args.config)

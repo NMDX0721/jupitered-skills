@@ -668,6 +668,45 @@ def action_setup(args):
     if password:
         cfg["password"] = password
 
+    if args.cookie:
+        cookie_val = args.cookie.strip()
+        if "jupiter=" in cookie_val:
+            for part in cookie_val.split(";"):
+                part = part.strip()
+                if part.startswith("jupiter="):
+                    cookie_val = part.split("=", 1)[1].strip()
+                    break
+
+        profile_dir = cfg.get("profile_dir", "./jupiter_profile")
+        abs_profile = os.path.abspath(os.path.expanduser(profile_dir))
+        os.makedirs(abs_profile, exist_ok=True)
+
+        print("[*] 正在验证并写入 Cookie...")
+        try:
+            with sync_playwright() as p:
+                browser_exe = detect_browser_executable(cfg.get("browser_path") or cfg.get("chrome_path"))
+                launch_kwargs = {"user_data_dir": abs_profile, "headless": True}
+                if browser_exe:
+                    launch_kwargs["executable_path"] = browser_exe
+                p_ctx = p.chromium.launch_persistent_context(**launch_kwargs)
+                p_ctx.add_cookies([
+                    {"name": "jupiter", "value": cookie_val, "domain": "login.jupitered.com", "path": "/"}
+                ])
+                page = p_ctx.pages[0] if p_ctx.pages else p_ctx.new_page()
+                page.goto("https://login.jupitered.com/login/index.php", wait_until="domcontentloaded")
+                time.sleep(2)
+                if not page.query_selector("#text_password1"):
+                    print("[+] Cookie 验证成功！已成功登录 JupiterEd 并持久化会话。")
+                    courses = discover_courses_from_page(page)
+                    if courses:
+                        print(f"[+] 自动探测到 {len(courses)//2} 门选课！已生成映射表。")
+                        cfg["course_ids"] = courses
+                else:
+                    print("[!] 警告：Cookie 写入完成，但页面仍要求输入密码，请检查 Cookie 是否已失效。")
+                p_ctx.close()
+        except Exception as e:
+            print(f"!! Cookie 写入验证异常: {e}")
+
     # Save to config.json
     try:
         with open(cfg_file, "w", encoding="utf-8") as f:
@@ -890,6 +929,7 @@ def main():
     parser.add_argument("--config", help="Path to custom config.json")
     parser.add_argument("--username", help="Student username/ID (for setup)")
     parser.add_argument("--password", help="Student password (for setup)")
+    parser.add_argument("--cookie", help="Direct jupiter cookie string (e.g. jupiter=xxxx...) for setup")
     parser.add_argument("--cdp", help="Remote debugging port or URL (e.g. 9222 or http://localhost:9222) for attach")
 
     args = parser.parse_args()

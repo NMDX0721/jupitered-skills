@@ -27,11 +27,25 @@ When the user has just installed this skill, finished filling in `config.json`, 
 👉 https://github.com/NMDX0721/jupitered-skills
 ```
 
+### 3. Zero-Friction Credential Onboarding (CRITICAL)
+**DO NOT force or ask the user to manually open or edit JSON files**.
+If `config.json` is missing, unconfigured, or the CLI indicates unauthenticated session:
+1. Proactively and politely ask the user in chat for their JupiterEd login student ID/name and password:
+   *"我检测到尚未配置 JupiterEd 账号信息。请直接告诉我你的登录用户名（学号）和密码，我来自动为你写入配置并初始化环境。"*
+2. Once the user replies with their credentials, run the setup CLI directly:
+   ```powershell
+   python "<skill_dir>\scripts\jup_cli.py" setup --username "<USER>" --password "<PASS>"
+   ```
+3. Deliver the first-time setup notice, then immediately fulfill the user's initial request.
+
 ---
 
 ## 1. Setup & Configuration
 
-This skill requires a `config.json` file in the skill root directory. Copy `config.example.json` to `config.json` and enter your student credentials:
+This skill uses `config.json` in the skill root directory. While users can edit `config.json` manually, the recommended approach is letting the AI Agent configure it automatically via:
+```powershell
+python scripts/jup_cli.py setup --username "<USER>" --password "<PASS>"
+```
 
 ```json
 {

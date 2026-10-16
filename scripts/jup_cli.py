@@ -601,24 +601,59 @@ def action_setup(args):
     cfg_file = os.path.join(base_dir, "config.json")
     example_file = os.path.join(base_dir, "config.example.json")
 
-    if not os.path.exists(cfg_file):
-        if os.path.exists(example_file):
+    cfg = {}
+    if os.path.exists(cfg_file):
+        try:
+            with open(cfg_file, "r", encoding="utf-8") as f:
+                cfg = json.load(f)
+        except Exception:
+            cfg = {}
+    elif os.path.exists(example_file):
+        try:
             with open(example_file, "r", encoding="utf-8") as f:
-                content = f.read()
-            with open(cfg_file, "w", encoding="utf-8") as f:
-                f.write(content)
-            print(f"[+] Created {cfg_file} from config.example.json")
-        else:
-            print(f"[-] Neither config.json nor config.example.json found in {base_dir}")
-            return
+                cfg = json.load(f)
+        except Exception:
+            cfg = {}
+
+    username = args.username
+    password = args.password
+
+    # Interactive prompt if running in an interactive terminal and credentials not given
+    if (not username or not password) and sys.stdin.isatty():
+        curr_u = cfg.get("username", "")
+        if not curr_u or curr_u == "YOUR_STUDENT_ID_OR_NAME":
+            try:
+                import getpass
+                print("\n=== JupiterEd 交互式配置向导 ===")
+                if not username:
+                    username = input("请输入 JupiterEd 登录账号/学号: ").strip()
+                if not password:
+                    password = getpass.getpass("请输入 JupiterEd 登录密码: ").strip()
+            except (KeyboardInterrupt, EOFError):
+                print("\n[!] Setup aborted.")
+                return
+
+    if username:
+        cfg["username"] = username
+    if password:
+        cfg["password"] = password
+
+    # Save to config.json
+    try:
+        with open(cfg_file, "w", encoding="utf-8") as f:
+            json.dump(cfg, f, indent=2, ensure_ascii=False)
+        print(f"[+] Saved credentials to: {cfg_file}")
+    except Exception as e:
+        print(f"!! Failed to write {cfg_file}: {e}")
+        return
 
     print("\n--- JupiterEd Skill Setup Verification ---")
-    cfg, _ = load_config(cfg_file)
     u = cfg.get("username", "")
     p = cfg.get("password", "")
     if not u or u == "YOUR_STUDENT_ID_OR_NAME" or not p:
-        print(f"[!] Please open '{cfg_file}' and fill in your real student username and password.")
-        print(f"[!] After updating '{cfg_file}', re-run: python scripts/jup_cli.py setup")
+        print(f"[!] Please provide valid credentials using:")
+        print(f"    python scripts/jup_cli.py setup --username <USER> --password <PASS>")
+        print(f"[!] Or edit '{cfg_file}' directly.")
         return
 
     github_url = cfg.get("github_repo", DEFAULT_GITHUB_REPO)
@@ -638,6 +673,8 @@ def main():
     parser.add_argument("--out", help="Output directory to automatically download attachments into")
     parser.add_argument("--screenshot", help="Path to save screenshot")
     parser.add_argument("--config", help="Path to custom config.json")
+    parser.add_argument("--username", help="Student username/ID (for setup)")
+    parser.add_argument("--password", help="Student password (for setup)")
 
     args = parser.parse_args()
 

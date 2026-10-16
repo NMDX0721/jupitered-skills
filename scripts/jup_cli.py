@@ -124,9 +124,14 @@ def create_context(playwright, cfg, headless=True, auto_login=True):
     launch_kwargs = {
         "user_data_dir": abs_profile,
         "headless": headless,
-        "viewport": {"width": 1280, "height": 900},
-        "accept_downloads": True
+        "accept_downloads": True,
+        "args": ["--start-maximized", "--new-window"]
     }
+
+    if not headless:
+        launch_kwargs["no_viewport"] = True
+    else:
+        launch_kwargs["viewport"] = {"width": 1280, "height": 900}
 
     if chrome_exe and os.path.exists(chrome_exe):
         launch_kwargs["executable_path"] = chrome_exe
@@ -134,6 +139,7 @@ def create_context(playwright, cfg, headless=True, auto_login=True):
     ctx = playwright.chromium.launch_persistent_context(**launch_kwargs)
     page = ctx.pages[0] if ctx.pages else ctx.new_page()
     page.goto(login_url, wait_until="domcontentloaded", timeout=45000)
+    page.bring_to_front()
     time.sleep(3)
 
     if not auto_login:

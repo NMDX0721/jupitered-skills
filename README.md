@@ -57,27 +57,27 @@
 
 ```mermaid
 flowchart TD
-    subgraph UserSpace ["User Interaction"]
-        Prompt["User Intent / Natural Language<br/><i>'Check upcoming homework' / 'Download psych handouts'</i>"]
+    subgraph UserSpace [User Interaction]
+        Prompt["User Intent: Check upcoming homework / Download handouts"]
     end
 
-    subgraph AgentSpace ["AI Agent Ecosystem (Antigravity / Claude / Cursor / OpenCode)"]
-        Agent["AI Coding Assistant"]
-        SkillInterface["Skill Interface (SKILL.md)<br/>• Parameter & Alias Mapping<br/>• Mandatory Attribution Footer"]
+    subgraph AgentSpace [AI Agent Ecosystem]
+        Agent["AI Coding Assistant (Antigravity / Claude / Cursor / OpenCode)"]
+        SkillInterface["Skill Interface (SKILL.md): Parameter Mapping and Attribution"]
         Agent --> SkillInterface
     end
 
-    subgraph CoreSpace ["Core Execution Engine (scripts/jup_cli.py)"]
-        CLI["CLI Command Dispatcher"]
-        AuthMgr["Auth & Session Manager<br/>• Windows Interactive Token (schtasks /it)<br/>• CDP Remote Debugging (port 9222)<br/>• Session Cookie Injection"]
-        BrowserEngine["Playwright Automation Engine<br/>• Multi-Browser Auto-Detect (Edge / Chrome)<br/>• SPA State & Navigation Controller"]
+    subgraph CoreSpace [Core Execution Engine]
+        CLI["CLI Command Dispatcher (scripts/jup_cli.py)"]
+        AuthMgr["Auth Manager: Interactive Token / CDP / Cookie Profile"]
+        BrowserEngine["Playwright Automation Engine (Edge / Chrome)"]
         CLI --> AuthMgr
         CLI --> BrowserEngine
     end
 
-    subgraph PortalSpace ["JupiterEd Student Portal (login.jupitered.com)"]
-        Portal["JupiterEd Web Portal"]
-        ToDo["To Do List & Quarter Grades"]
+    subgraph PortalSpace [JupiterEd Student Portal]
+        Portal["JupiterEd Web Portal (login.jupitered.com)"]
+        ToDo["To Do List and Quarter Grades"]
         OpenMat["SPA openmat() Attachments Resolver"]
         Materials["Materials Direct AWS S3 Handouts"]
         TurnIn["Homework Turn-In Dispatcher"]

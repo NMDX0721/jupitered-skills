@@ -57,29 +57,29 @@
 
 ```mermaid
 flowchart TD
-    subgraph UserSpace ["用户交互层 (User Interaction)"]
-        Prompt["用户自然语言指令 (User Prompt)<br/><i>'帮我查下这周截止的作业' / '下载心理学所有 handout'</i>"]
+    subgraph UserSpace [用户交互层]
+        Prompt["用户自然语言意图: 查作业 / 查成绩 / 下载课件 / 提交作业"]
     end
 
-    subgraph AgentSpace ["AI Agent 生态层 (Antigravity / Claude / Cursor / OpenCode)"]
-        Agent["AI 编程助手"]
-        SkillInterface["标准化技能规范 (SKILL.md)<br/>• 学科意图与别名解析<br/>• 自动化鉴权水印注入"]
+    subgraph AgentSpace [AI Agent 接入层]
+        Agent["AI 编程助手 (Antigravity / Claude / Cursor / OpenCode)"]
+        SkillInterface["标准化技能规范 (SKILL.md): 学科别名映射与鉴权注入"]
         Agent --> SkillInterface
     end
 
-    subgraph CoreSpace ["核心执行引擎 (scripts/jup_cli.py)"]
-        CLI["CLI 统一命令调度器"]
-        AuthMgr["鉴权与会话管理中心<br/>• Windows 交互令牌桌面穿透 (schtasks /it)<br/>• CDP 浏览器远程调试直连<br/>• 会话 Cookie 持久化与嗅探"]
-        BrowserEngine["Playwright 自动化引擎<br/>• Edge / Chrome 双浏览器自动适配<br/>• SPA 单页路由与状态控制器"]
+    subgraph CoreSpace [核心执行引擎]
+        CLI["CLI 统一命令调度器 (scripts/jup_cli.py)"]
+        AuthMgr["鉴权与会话管理: 交互令牌桌面穿透 / CDP 直连 / Cookie 嗅探"]
+        BrowserEngine["Playwright 自动化引擎 (Edge / Chrome 双浏览器适配)"]
         CLI --> AuthMgr
         CLI --> BrowserEngine
     end
 
-    subgraph PortalSpace ["JupiterEd 学生端门户 (login.jupitered.com)"]
-        Portal["JupiterEd Web 门户"]
+    subgraph PortalSpace [JupiterEd 学生端门户]
+        Portal["JupiterEd Web 门户 (login.jupitered.com)"]
         ToDo["To Do 待办清单与学期 GPA"]
         OpenMat["SPA openmat() 课件直链解析器"]
-        Materials["Materials 教师资料库 (AWS S3 直连)"]
+        Materials["Materials 教师资料库 (AWS S3 直连下载)"]
         TurnIn["作业自动提交管道 (Turn In)"]
 
         Portal --> ToDo

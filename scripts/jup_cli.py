@@ -748,6 +748,26 @@ def discover_courses_from_page(page):
         return map;
     }""")
 
+def launch_interactive_task_windows():
+    import getpass
+    username = getpass.getuser()
+    script_path = os.path.abspath(__file__)
+    task_name = "JupiterEd_Interactive_Login"
+    tr_cmd = f'\\"python\\" \\"{script_path}\\" login --worker'
+    create_cmd = [
+        "schtasks", "/create", "/tn", task_name,
+        "/tr", tr_cmd,
+        "/sc", "ONCE", "/st", "23:59",
+        "/ru", username, "/it", "/f"
+    ]
+    res = subprocess.run(create_cmd, capture_output=True, text=True)
+    if res.returncode != 0:
+        return False
+    res_run = subprocess.run(["schtasks", "/run", "/tn", task_name], capture_output=True, text=True)
+    time.sleep(2)
+    subprocess.run(["schtasks", "/delete", "/tn", task_name, "/f"], capture_output=True, text=True)
+    return res_run.returncode == 0
+
 def action_login(args):
     if args.cdp:
         action_attach(args)
@@ -756,6 +776,30 @@ def action_login(args):
     base_dir = get_base_dir()
     cfg_file = os.path.join(base_dir, "config.json")
     example_file = os.path.join(base_dir, "config.example.json")
+
+    # If --it is specified and not worker, launch via schtasks /it to penetrate background session
+    if getattr(args, "it", False) and not getattr(args, "worker", False):
+        print("=" * 68)
+        print("🌟 JupiterEd 交互令牌桌面唤起 (Interactive Token Launcher)")
+        print("=" * 68)
+        print("[*] 正在通过 Windows 交互令牌穿透后台隔离，直接投射登录窗口到物理桌面...")
+        if launch_interactive_task_windows():
+            print("[+] 浏览器窗口已成功在桌面弹出！请在弹出的页面中完成登录。")
+            print("[*] 后台正在监听登录与课程探测结果...\n")
+            for _ in range(120):
+                time.sleep(2)
+                if os.path.exists(cfg_file) and os.path.getsize(cfg_file) > 10:
+                    try:
+                        with open(cfg_file, "r", encoding="utf-8") as f:
+                            c = json.load(f)
+                        if c.get("course_ids"):
+                            print("\n[+] 🎉 登录成功！配置已自动同步完成。")
+                            return
+                    except Exception:
+                        pass
+            return
+        else:
+            print("[!] 交互令牌调用未成功，继续以标准模式尝试...")
 
     cfg = {}
     if os.path.exists(cfg_file):
@@ -931,6 +975,8 @@ def main():
     parser.add_argument("--password", help="Student password (for setup)")
     parser.add_argument("--cookie", help="Direct jupiter cookie string (e.g. jupiter=xxxx...) for setup")
     parser.add_argument("--cdp", help="Remote debugging port or URL (e.g. 9222 or http://localhost:9222) for attach")
+    parser.add_argument("--it", action="store_true", help="Launch interactive login window onto active desktop via Windows interactive token")
+    parser.add_argument("--worker", action="store_true", help=argparse.SUPPRESS)
 
     args = parser.parse_args()
 

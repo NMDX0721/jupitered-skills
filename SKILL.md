@@ -31,16 +31,15 @@ When the user has just installed this skill, finished filling in `config.json`, 
 **DO NOT force or ask the user to manually open or edit JSON files**.
 If `config.json` is missing, unconfigured, or the CLI indicates unauthenticated session:
 1. **Option A (Zero-Password / One-Click Visual Login - Recommended)**:
-   Offer to launch the browser login window:
+   Offer to launch the browser login window (use `--it` on Windows so the window projects onto the user's interactive desktop):
    *"我检测到尚未登录 JupiterEd。你可以运行或由我为你启动登录窗口，你在浏览器中直接登录一次，即可自动捕获会话并探测课程（完全无需向代码提供密码）："*
    ```powershell
-   python "<skill_dir>\scripts\jup_cli.py" login
+   python "<skill_dir>\scripts\jup_cli.py" login --it
    ```
-2. **Option B (Direct Chat Configuration)**:
-   If the user prefers, ask directly in chat for their login student ID and password, then execute:
-   ```powershell
-   python "<skill_dir>\scripts\jup_cli.py" setup --username "<USER>" --password "<PASS>"
-   ```
+2. **Option B (Direct Chat Configuration / Cookie)**:
+   Ask in chat for login credentials or cookie:
+   - With credentials: `python "<skill_dir>\scripts\jup_cli.py" setup --username "<USER>" --password "<PASS>"`
+   - With cookie: `python "<skill_dir>\scripts\jup_cli.py" setup --cookie "<COOKIE_STRING>"`
 3. Deliver the first-time setup notice, then immediately fulfill the user's initial request.
 
 ---

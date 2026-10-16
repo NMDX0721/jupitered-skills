@@ -56,23 +56,21 @@
 ## 🏗️ Architecture
 
 ```mermaid
-flowchart TD
-    subgraph L1 ["1. AI Agent Ecosystem"]
-        direction LR
-        User["👤 User Prompt"] --> Agent["🤖 AI Assistant"] --> Skill["📋 SKILL.md"]
-    end
+flowchart LR
+    User["👤 User Prompt"] --> Agent["🤖 AI Assistant + SKILL.md"]
+    Agent --> CLI["⚡ CLI Dispatcher (jup_cli.py)"]
+    CLI --> Auth["🔑 Auth Manager (IT / CDP / Cookie)"]
+    CLI --> Browser["🌐 Playwright (Edge / Chrome)"]
+    Auth -.-> Browser
+    Browser --> Portal[("🏫 JupiterEd Portal")]
     
-    subgraph L2 ["2. Core Execution Engine (scripts/jup_cli.py)"]
-        direction LR
-        CLI["⚡ CLI Dispatcher"] --> Auth["🔑 Auth Manager (IT / CDP / Cookie)"] --> Browser["🌐 Playwright Engine (Edge / Chrome)"]
-    end
-
-    subgraph L3 ["3. JupiterEd Student Portal & Cloud Services"]
-        direction LR
-        Portal[("🏫 JupiterEd Portal")] --> Actions["📚 To-Do & Grades   •   📦 Materials S3 Sync   •   📤 Homework Turn-In"]
-    end
-
-    L1 --> L2 --> L3
+    Portal --> ToDo["📚 To-Do & Grades"]
+    Portal --> Mat["📦 Materials S3 Sync"]
+    Portal --> TurnIn["📤 Homework Turn-In"]
+    
+    ToDo --> Out["🎯 Result to Agent & User"]
+    Mat --> Out
+    TurnIn --> Out
 ```
 
 ---

@@ -56,35 +56,16 @@
 ## 🏗️ 工作架构 / Architecture
 
 ```mermaid
-flowchart TD
-    subgraph S1 ["1. AI Agent 交互与规范层"]
-        direction LR
-        Prompt["用户自然语言意图 (Prompt)"] --> Agent["AI 编程助手 (Antigravity / Claude / Cursor)"]
-        Agent --> Skill["SKILL.md (工作流与安全调度)"]
-    end
-
-    subgraph S2 ["2. 核心执行引擎 (scripts/jup_cli.py)"]
-        direction LR
-        CLI["CLI 命令调度器"]
-        Auth["会话管理 (Windows IT / CDP / Cookie)"]
-        Browser["Playwright 自动化引擎 (Edge & Chrome)"]
-        CLI --> Auth
-        CLI --> Browser
-    end
-
-    subgraph S3 ["3. JupiterEd 学生端门户与云端"]
-        direction LR
-        Portal["login.jupitered.com"]
-        ToDo["To-Do 待办与成绩"]
-        Mat["Materials 讲义与课件库"]
-        TurnIn["作业自动提交 (Turn In)"]
-        Portal --> ToDo
-        Portal --> Mat
-        Portal --> TurnIn
-    end
-
-    Skill --> CLI
-    Browser --> Portal
+flowchart LR
+    User["👤 用户自然语言意图"] --> Agent["🤖 AI 编程助手 + SKILL.md"]
+    Agent --> CLI["⚡ CLI 调度器 (jup_cli.py)"]
+    CLI --> Auth["🔑 会话鉴权 (IT / CDP / Cookie)"]
+    CLI --> Browser["🌐 Playwright 引擎 (Edge / Chrome)"]
+    Auth -.-> Browser
+    Browser --> Portal[("🏫 JupiterEd 学生端门户")]
+    Portal --> ToDo["📚 To-Do 待办与成绩"]
+    Portal --> Mat["📦 Materials 课件同步"]
+    Portal --> TurnIn["📤 作业文件自动提交"]
 ```
 
 ---

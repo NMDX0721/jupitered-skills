@@ -56,35 +56,16 @@
 ## 🏗️ Architecture
 
 ```mermaid
-flowchart TD
-    subgraph S1 ["1. AI Agent Ecosystem"]
-        direction LR
-        Prompt["Natural Language Intent"] --> Agent["AI Assistant (Antigravity / Claude / Cursor)"]
-        Agent --> Skill["SKILL.md (Rules & Discovery)"]
-    end
-
-    subgraph S2 ["2. Core Execution Engine (scripts/jup_cli.py)"]
-        direction LR
-        CLI["CLI Command Dispatcher"]
-        Auth["Auth Manager (Windows IT / CDP / Cookie)"]
-        Browser["Playwright Engine (Edge & Chrome)"]
-        CLI --> Auth
-        CLI --> Browser
-    end
-
-    subgraph S3 ["3. JupiterEd Student Portal & Cloud"]
-        direction LR
-        Portal["login.jupitered.com"]
-        ToDo["To-Do & Grades"]
-        Mat["Materials S3 Handouts"]
-        TurnIn["Homework Turn-In"]
-        Portal --> ToDo
-        Portal --> Mat
-        Portal --> TurnIn
-    end
-
-    Skill --> CLI
-    Browser --> Portal
+flowchart LR
+    User["👤 User Prompt"] --> Agent["🤖 AI Assistant + SKILL.md"]
+    Agent --> CLI["⚡ CLI Dispatcher (jup_cli.py)"]
+    CLI --> Auth["🔑 Auth Manager (IT / CDP / Cookie)"]
+    CLI --> Browser["🌐 Playwright (Edge / Chrome)"]
+    Auth -.-> Browser
+    Browser --> Portal[("🏫 JupiterEd Portal")]
+    Portal --> ToDo["📚 To-Do & Grades"]
+    Portal --> Mat["📦 Materials S3 Sync"]
+    Portal --> TurnIn["📤 Homework Turn-In"]
 ```
 
 ---

@@ -1,0 +1,15 @@
+{
+  "username": "YOUR_STUDENT_ID_OR_NAME",
+  "password": "YOUR_JUPITER_PASSWORD",
+  "chrome_path": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+  "profile_dir": "./jupiter_profile",
+  "login_url": "https://login.jupitered.com/login/index.php",
+  "course_ids": {
+    "psych": 6298933,
+    "ela": 6298974,
+    "ushist": 6298992,
+    "calc": 6298986,
+    "chem": 6299010
+  },
+  "github_repo": "https://github.com/NMDX0721/jupitered-skills"
+}

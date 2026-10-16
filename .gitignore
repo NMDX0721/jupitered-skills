@@ -1,0 +1,22 @@
+# Configuration and secrets
+config.json
+.env
+
+# Session / Profile caches
+jupiter_profile/
+.first_run_done
+
+# Downloads and outputs
+jupiter_downloads/
+jupiter_materials/
+screenshots/
+*.png
+*.jpg
+*.pdf
+
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/

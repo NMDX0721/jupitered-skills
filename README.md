@@ -77,15 +77,21 @@ flowchart LR
 
 ## 🚀 Quick Start
 
-### ⚡ One-Shot Agent Install (Zero-CLI, Recommended)
+### ⚡ One-Shot Universal Agent Install (Cross-Agent & Cross-Platform)
 
-If you are using an AI coding assistant (**Google Antigravity**, **Claude Code**, **Cursor**, **OpenCode**, etc.), you don't even need to touch the terminal. **Simply copy and send this prompt to your Agent**:
+Regardless of whether you are using **Google Antigravity**, **Claude Code**, **Cursor**, **OpenCode**, or any other AI assistant, **simply copy and send this universal prompt to your Agent**:
 
 ```markdown
-Help me install the jupiter-ed skill from https://github.com/NMDX0721/jupitered-skills.git into my global skills directory (~/.gemini/antigravity/skills/jupiter-ed or .agents/skills/jupiter-ed), install the required dependencies (pip install playwright && playwright install chromium), and guide me through the one-click zero-password login.
+Please install and configure the JupiterEd skill from https://github.com/NMDX0721/jupitered-skills.git for me:
+1. Detect the appropriate skills directory for your agent system (e.g., global ~/.gemini/antigravity/skills/jupiter-ed, or workspace .agents/skills/jupiter-ed / .claude/skills/) and clone the repository;
+2. Verify Python 3.9+ and install dependencies (pip install playwright && playwright install chromium);
+3. Based on my OS (Windows: run `python scripts/jup_cli.py login --it` desktop popup; macOS/Linux: guide with `--cookie` injection or CDP attach), guide me to complete the zero-password onboarding.
 ```
 
-> 💡 **Tip**: Your AI Agent will automatically clone the skill, install Playwright, set up the directory, and invoke the interactive login popup for you!
+> 💡 **Universal Compatibility Guarantee**:
+> * 🌐 **Multi-Agent**: Automatically adapts to Google Antigravity, Claude Code, Cursor, OpenCode, and standard `.agents/skills` conventions;
+> * 💻 **Cross-Platform**: Windows automatically triggers `login --it` desktop token popup; macOS/Linux seamlessly guides cookie injection or CDP attach;
+> * 🐍 **Environment-Aware**: Automatically targets active Python, virtual environments (venv), or conda.
 
 ---
 

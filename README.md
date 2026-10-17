@@ -77,7 +77,7 @@ flowchart LR
 
 ## 🚀 Quick Start
 
-### ⚡ One-Shot Universal Agent Install (Cross-Agent & Cross-Platform)
+### ⚡ One-Shot Agent Install (One-Line Automated Setup)
 
 Regardless of which AI coding assistant or agent you use (**Claude Code**, **Cursor**, **OpenCode**, CLI agents, etc.), **simply copy and send this universal prompt to your Agent**:
 

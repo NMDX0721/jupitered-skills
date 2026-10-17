@@ -77,7 +77,7 @@ flowchart LR
 
 ## 🚀 快速开始 / Quick Start
 
-### ⚡ 一句话让 AI Agent 自动安装（全 Agent / 跨平台通用兼容）
+### ⚡ One-Shot 安装（一句话让 AI Agent 自动部署）
 
 无论你使用的是哪种 AI 编程助手或智能体（**Claude Code**、**Cursor**、**OpenCode**、终端 CLI Agent 等），**直接复制并发送以下通用兼容提示词**，Agent 即可自适应完成全自动部署：
 

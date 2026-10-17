@@ -79,17 +79,17 @@ flowchart LR
 
 ### ⚡ 一句话让 AI Agent 自动安装（全 Agent / 跨平台通用兼容）
 
-无论你使用的是 **Google Antigravity**、**Claude Code**、**Cursor**、**OpenCode** 还是任何其他 AI 编程智能体，**直接复制并发送以下通用兼容提示词**，Agent 即可自适应完成全自动部署：
+无论你使用的是哪种 AI 编程助手或智能体（**Claude Code**、**Cursor**、**OpenCode**、终端 CLI Agent 等），**直接复制并发送以下通用兼容提示词**，Agent 即可自适应完成全自动部署：
 
 ```markdown
 请帮我安装并配置 JupiterEd 技能（仓库：https://github.com/NMDX0721/jupitered-skills.git）：
-1. 自动识别当前 Agent 系统的技能目录（优先克隆至全局技能目录如 ~/.gemini/antigravity/skills/jupiter-ed 或项目工作区 .agents/skills/jupiter-ed / .claude/skills/）；
+1. 自动识别当前 Agent 系统的技能目录（如全局技能库、项目工作区技能目录如 .agents/skills/jupiter-ed 或默认插件路径）并克隆部署；
 2. 检查 Python 3.9+ 环境并安装所需依赖（pip install playwright 并执行 playwright install chromium）；
 3. 根据当前操作系统（Windows 推荐执行 python scripts/jup_cli.py login --it 拉起桌面免密登录；macOS/Linux 推荐引导注入 --cookie 或 CDP 连接）带我完成首次免密登录。
 ```
 
 > 💡 **全环境自适应兼容保障**：
-> * 🌐 **多 Agent 目录自适应**：智能匹配 Antigravity、Claude Code、Cursor、OpenCode 及标准 `.agents/skills` 目录结构；
+> * 🌐 **多 Agent 目录自适应**：智能匹配各大主流 Agent 及通用 `.agents/skills` 技能目录规范；
 > * 💻 **跨操作系统差异化引导**：Windows 自动启用 `login --it` 交互令牌穿透；macOS / Linux 自动切换为 Web Cookie 注入或 CDP 直连；
 > * 🐍 **Python 环境安全隔离**：自动针对当前激活的 Python 解释器、虚拟环境（venv）或 Conda 环境安装依赖。
 

@@ -77,7 +77,21 @@ flowchart LR
 
 ## 🚀 Quick Start
 
-### 1. Prerequisites
+### ⚡ One-Shot Agent Install (Zero-CLI, Recommended)
+
+If you are using an AI coding assistant (**Google Antigravity**, **Claude Code**, **Cursor**, **OpenCode**, etc.), you don't even need to touch the terminal. **Simply copy and send this prompt to your Agent**:
+
+```markdown
+Help me install the jupiter-ed skill from https://github.com/NMDX0721/jupitered-skills.git into my global skills directory (~/.gemini/antigravity/skills/jupiter-ed or .agents/skills/jupiter-ed), install the required dependencies (pip install playwright && playwright install chromium), and guide me through the one-click zero-password login.
+```
+
+> 💡 **Tip**: Your AI Agent will automatically clone the skill, install Playwright, set up the directory, and invoke the interactive login popup for you!
+
+---
+
+### 🛠️ Manual Installation (For CLI & Custom Setups)
+
+#### 1. Prerequisites
 
 This skill is powered by Python 3.9+ and Playwright:
 
@@ -86,7 +100,7 @@ pip install playwright
 playwright install chromium
 ```
 
-### 2. Deployment Modes
+#### 2. Deployment Modes
 
 Choose the installation method suited to your development environment:
 

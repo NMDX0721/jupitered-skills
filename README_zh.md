@@ -77,7 +77,21 @@ flowchart LR
 
 ## 🚀 快速开始 / Quick Start
 
-### 1. 依赖安装 / Prerequisites
+### ⚡ 一句话让 AI Agent 自动安装（零命令行，最推荐）
+
+如果你正在使用 AI 编程助手（**Google Antigravity**、**Claude Code**、**Cursor**、**OpenCode** 等），完全无需手动敲命令行。**只需将下面这句话直接复制发给你的 Agent**：
+
+```markdown
+帮我从 https://github.com/NMDX0721/jupitered-skills.git 安装 jupiter-ed 技能到全局技能目录（~/.gemini/antigravity/skills/jupiter-ed 或当前工作区 .agents/skills/jupiter-ed），安装所需依赖（pip install playwright && playwright install chromium），并带我完成一键免密登录配置。
+```
+
+> 💡 **提示**：你的 AI Agent 将会自动完成克隆仓库、安装 Playwright 依赖、校验目录环境，并为你拉起桌面免密登录弹窗！
+
+---
+
+### 🛠️ 手动安装方式（适合开发者与独立 CLI 使用）
+
+#### 1. 依赖安装 / Prerequisites
 
 本 Skill 基于 Python 3.9+ 与 Playwright 构建：
 
@@ -86,7 +100,7 @@ pip install playwright
 playwright install chromium
 ```
 
-### 2. 部署方式 / Deployment
+#### 2. 部署方式 / Deployment
 
 根据你的工作环境选择对应的安装方式：
 
